@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a4788d9225e7544784b03901337c224, type: 3}
+  m_Name: Environment Settings
+  m_EditorClassIdentifier: 
+  _groundColor: {r: 1, g: 1, b: 1, a: 1}
+  _groundHeight: {fileID: 11400000, guid: 23940f7b39785ae41bdf3ac792fbca2b, type: 2}
+  _skyColor: {r: 0.46226418, g: 0.46226418, b: 0.46226418, a: 0}
+  _lattice: {fileID: 11400000, guid: 100e292e68dd6fd4991d893b6beaaa16, type: 2}
+  _geometry: {fileID: 11400000, guid: d312b495428cf39469d4a18b9eff327d, type: 2}

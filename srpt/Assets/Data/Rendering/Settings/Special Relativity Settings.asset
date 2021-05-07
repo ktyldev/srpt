@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb0faabc9928986438bb3a08232b0a99, type: 3}
+  m_Name: Special Relativity Settings
+  m_EditorClassIdentifier: Assembly-CSharp:Ktyl.Rendering:RelativisticSettings
+  _b: {fileID: 11400000, guid: ab9ab930f639ce54e9fbe9e06c575877, type: 2}
+  _dopplerToggle: {fileID: 11400000, guid: 1ff4dfc6cfe6ff7469f837dc9bb93eca, type: 2}
+  _searchlightToggle: {fileID: 11400000, guid: cbc359ebbf6a85e42a079b339e2cd2a9, type: 2}
+  _wavelengthScalingToggle: {fileID: 11400000, guid: eedf90b15ff2d56408a56706a1544127, type: 2}

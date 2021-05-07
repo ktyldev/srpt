@@ -1,0 +1,148 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+#include "Assets/Shaders/color.cginc"
+#include "Assets/Shaders/v3.cginc"
+#include "Assets/Shaders/lambert.cginc"
+#include "Assets/Shaders/sphere.cginc"
+#include "Assets/Shaders/cylinder.cginc"
+#include "Assets/Shaders/ray.cginc"
+#include "Assets/Shaders/einstein.cginc"
+
+// output
+RWTexture2D<float4> Result;
+// depth
+RWTexture2D<float4> Depth;
+
+int _SamplesPerPixel;
+int _Bounces;
+float _Aspect;
+float _WavelengthScaling;
+
+// environment
+float3 _SkyColor;
+float4x4 _Lattice2World;
+
+StructuredBuffer<Sphere> _Spheres;
+StructuredBuffer<Cylinder> _Cylinders;
+
+#define GROUP_SIZE 32
+
+RayHit trace(Ray ray)
+{
+     RayHit best_hit = create_ray_hit();
+ 
+     uint num_spheres, stride, i;
+     _Spheres.GetDimensions(num_spheres, stride);
+     for (i = 0; i < num_spheres; i++)
+     {
+         Sphere s = _Spheres[i];
+         s.position = mul(_Lattice2World, s.position);
+         intersect_sphere(ray, best_hit, s);
+     }
+ 
+     float4 v = 1;
+     
+     uint num_cylinders;
+     _Cylinders.GetDimensions(num_cylinders, stride);
+     for (i = 0; i < num_cylinders; i++)
+     {
+         Cylinder c = _Cylinders[i];
+         c.position = mul(_Lattice2World, c.position);
+         c.axis = mul(_Lattice2World, c.axis);
+         intersect_cylinder(ray, best_hit, c);
+     }
+     
+     return best_hit;
+
+}
+
+float3 shade(inout Ray ray, RayHit hit)
+{
+    // hit something
+    if (hit.distance < _CameraFarClip)
+    {
+        // emission
+        if (any(hit.emission))
+        {
+            ray.wavelengths = 1000;
+            return hit.emission;
+        }
+
+        // scatter if diffuse
+        return scatter_lambert(ray, hit);
+    }
+
+    // didnt hit anything
+    return _SkyColor;
+}
+
+float4 random_wavelengths(float min, float max)
+{
+    return float4(
+        lerp(min, max, rand()),
+        lerp(min, max, rand()),
+        lerp(min, max, rand()),
+        lerp(min, max, rand()));
+}
+
+[numthreads(GROUP_SIZE,GROUP_SIZE,1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    // TODO: motion in arbitrary direction - poincaré transformations
+    // for now observer is hardcoded to move along the z-axis
+
+    _Pixel = id.xy;
+
+    // get dimensions of render texture
+    uint width, height;
+    Result.GetDimensions(width, height);
+
+    // transform pixel to -1..1 range
+    float2 uv = float2(id.xy / float2(width, height) * 2.0 - 1.0);
+    uv.x *= _Aspect;
+
+    // B = u/c:
+    // for our purposes, it is a number between -1 and 1 representing the speed of the
+    // non-observer reference frame as a fraction of the speed of light along the z-axis
+    float B = _Velocity;
+
+    // ascertain the greatest possible current value of doppler factor
+    float D_max = 1.0f / sqrt(1.0f - B * B);
+    
+    // scale min and max possible wavelengths by max doppler. as B increases, rays with originally visible
+    // wavelengths represent a smaller amount of the range of wavelengths that could be red- or blue-
+    // shifted into visibility.
+    float W_min = lerp(MIN_VISIBLE, MIN_VISIBLE / D_max, _WavelengthScaling);
+    float W_max = lerp(MAX_VISIBLE, MAX_VISIBLE * D_max, _WavelengthScaling);
+
+    float d = Depth[id.xy];
+
+    float far = _CameraFarClip;
+
+    // scale the number of bounces taken by light with depth
+    int bounces = (1.0 - d * d / (far * far)) * _Bounces;
+    bounces = max(1,bounces);
+
+    float3 result = 0;
+    
+    // create a ray in observer reference frame
+    Ray ray = create_camera_ray(uv);
+    ray.wavelengths = random_wavelengths(W_min, W_max);
+    RayHit hit;
+
+    transform_ray(ray);
+
+    for (int i = 0; i < _SamplesPerPixel; i++)
+    {
+        for (int j = 0; j < bounces; j++)
+        {
+            hit = trace(ray);
+
+            float4 c = evaluate_color(ray.wavelengths, ray.energy);
+            result += c * shade(ray, hit);
+        }
+    }
+
+    Result[id.xy] = float4(result.xyz, 1);
+}

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf15de3bc6661dd48b9c8ca14ba5fd09, type: 3}
+  m_Name: Sampling Settings
+  m_EditorClassIdentifier: 
+  _initialValue:
+    depth: 8
+    samplesPerPixel: 1
+    _sampleWeight: {fileID: 11400000, guid: e4e3daaf8ee6da44487cc18b36add270, type: 2}
+    _editorSampleWeight: 0.1
+  _readOnly: 1
+  _sampleAccumulator: {fileID: 2100000, guid: 7b8ecf50e60397d45993878d48755033, type: 2}

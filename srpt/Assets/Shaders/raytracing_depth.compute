@@ -1,0 +1,91 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+#include "Assets/Shaders/lambert.cginc"
+#include "Assets/Shaders/sphere.cginc"
+#include "Assets/Shaders/cylinder.cginc"
+#include "Assets/Shaders/ray.cginc"
+#include "Assets/Shaders/einstein.cginc"
+
+// depth texture
+RWTexture2D<float4> Result;
+
+float _Aspect;
+float4x4 _Lattice2World;
+
+StructuredBuffer<Sphere> _Spheres;
+StructuredBuffer<Cylinder> _Cylinders;
+
+#define GROUP_SIZE 32
+
+RayHit trace(Ray ray)
+{
+     RayHit best_hit = create_ray_hit();
+ 
+     uint num_spheres, stride, i;
+     _Spheres.GetDimensions(num_spheres, stride);
+     for (i = 0; i < num_spheres; i++)
+     {
+         Sphere s = _Spheres[i];
+         s.position = mul(_Lattice2World, s.position);
+         intersect_sphere(ray, best_hit, s);
+     }
+ 
+     float4 v = 1;
+     
+     uint num_cylinders;
+     _Cylinders.GetDimensions(num_cylinders, stride);
+     for (i = 0; i < num_cylinders; i++)
+     {
+         Cylinder c = _Cylinders[i];
+         c.position = mul(_Lattice2World, c.position);
+         c.axis = mul(_Lattice2World, c.axis);
+         intersect_cylinder(ray, best_hit, c);
+     }
+     
+     return best_hit;
+}
+
+float3 shade(inout Ray ray, RayHit hit)
+{
+    // hit something
+    if (hit.distance < BIG)
+    {
+        // emission
+        if (any(hit.emission))
+        {
+            ray.wavelengths = 1000;
+            return hit.emission;
+        }
+        
+        // scatter if diffuse
+        return scatter_lambert(ray, hit);
+    }
+
+    // didnt hit anything
+    return 1;
+}
+
+[numthreads(GROUP_SIZE,GROUP_SIZE,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: motion in arbitrary direction - poincaré transformations
+    // for now observer is hardcoded to move along the z-axis
+    
+    _Pixel = id.xy;
+    
+    // get dimensions of render texture
+    uint width, height;
+    Result.GetDimensions(width, height);
+
+    // transform pixel to -1..1 range
+    float2 uv = float2(id.xy / float2(width, height) * 2.0 - 1.0);
+    uv.x *= _Aspect;
+    
+    // trace depth
+    Ray ray = create_camera_ray(uv);
+    transform_ray(ray);
+    RayHit closest_hit = trace(ray);
+    float d = closest_hit.distance/_CameraFarClip;
+    Result[id.xy] = 1.0-d;
+}

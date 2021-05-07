@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: faa10ada25c79c34dadd43d0aea3495e, type: 3}
+  m_Name: Relativistic Render Settings
+  m_EditorClassIdentifier: 
+  _samplingSettings: {fileID: 11400000, guid: f890da022178a8e49870348175351cb5, type: 2}
+  _environmentSettings: {fileID: 11400000, guid: 3a24200ba3c4eed4595d4f3ac2a2e6a1, type: 2}
+  _shader: {fileID: 7200000, guid: 5920f45ed4a737b43bf9a885d05112b6, type: 3}
+  _depthShader: {fileID: 7200000, guid: da4c1d192c76d504eacdd8a08b057335, type: 3}
+  _depth: {fileID: 8400000, guid: 45769df29e8c43d40b03afc765f29041, type: 2}
+  _destination: {fileID: 8400000, guid: 99ab6f8ecab443748bd5710585d36ffb, type: 2}
+  _lattice2World: {fileID: 11400000, guid: e6afdda90cc42654491a83df2b0600f1, type: 2}
+  _cameraProperties: {fileID: 11400000, guid: 8e43dabb2b7def2499c190296ed93f27, type: 2}
+  _relativitySettings: {fileID: 11400000, guid: 731ff06b043b2774eafa0edd6907e2da, type: 2}
+  _b: {fileID: 11400000, guid: ab9ab930f639ce54e9fbe9e06c575877, type: 2}
+  _aberrationContribution: {fileID: 11400000, guid: 1fa83619d51e18343b5de3f0b49867a6, type: 2}
+  _dopplerContribution: {fileID: 11400000, guid: 89736a04dfd02f342863f27233cbde2b, type: 2}
+  _searchlightContribution: {fileID: 11400000, guid: bf03b7ea5290315499fa18476d6749a9, type: 2}
