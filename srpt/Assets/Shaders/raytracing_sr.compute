@@ -28,10 +28,8 @@ StructuredBuffer<Cylinder> _Cylinders;
 
 #define GROUP_SIZE 32
 
-RayHit trace(Ray ray)
+void trace(Ray ray, inout RayHit best_hit)
 {
-     RayHit best_hit = create_ray_hit();
- 
      uint num_spheres, stride, i;
      _Spheres.GetDimensions(num_spheres, stride);
      for (i = 0; i < num_spheres; i++)
@@ -52,9 +50,6 @@ RayHit trace(Ray ray)
          c.axis = mul(_Lattice2World, c.axis);
          intersect_cylinder(ray, best_hit, c);
      }
-     
-     return best_hit;
-
 }
 
 float3 shade(inout Ray ray, RayHit hit)
@@ -137,7 +132,11 @@ void CSMain(uint3 id : SV_DispatchThreadID)
     {
         for (int j = 0; j < bounces; j++)
         {
-            hit = trace(ray);
+            hit = create_ray_hit();
+            if (d > 0.001)
+            {
+                trace(ray, hit);
+            }
 
             float4 c = evaluate_color(ray.wavelengths, ray.energy);
             result += c * shade(ray, hit);
